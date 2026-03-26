@@ -1,0 +1,53 @@
+using UnityEngine;
+
+public class PlayerMagicEffect : MonoBehaviour
+{
+    public ParticleSystem magicParticles; // Ссылка на систему частиц
+    [SerializeField] private Renderer playerRenderer; // Визуализация игрока
+    [SerializeField] private Collider playerCollider; // Коллайдер игрока
+
+    [SerializeField] private float destroyDelay = 2f; // Задержка удаления
+
+    void Start()
+    {
+        // Получаем компоненты
+        magicParticles = GetComponentInChildren<ParticleSystem>();
+
+        // Убедимся, что эффект изначально отключён
+        if (magicParticles != null)
+            magicParticles.gameObject.SetActive(false);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Magic"))
+        {
+            TriggerMagicEffect();
+        }
+    }
+
+    void TriggerMagicEffect()
+    {
+        Debug.Log("Игрок в магии");
+
+        // Отключаем визуализацию игрока
+        if (playerRenderer != null)
+            playerRenderer.enabled = false;
+
+        // Активируем и запускаем систему частиц
+        if (magicParticles != null)
+        {
+            magicParticles.gameObject.SetActive(true);
+            magicParticles.Play();
+
+            // Запускаем таймер удаления
+            Invoke(nameof(DestroyPlayer), destroyDelay);
+        }
+    }
+
+    void DestroyPlayer()
+    {
+	// Удаляем весь объект игрока после завершения анимации частиц
+        Destroy(gameObject);
+    }
+}
